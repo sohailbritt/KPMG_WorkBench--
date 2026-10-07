@@ -35,7 +35,7 @@ Deploy `storybook-static/` and `storybook-static-angular/` as two sites. Both us
 
 ## Angular components
 
-Standalone, `OnPush`, signal inputs; selectors are `kpmg-<name>`. Each mirrors its React counterpart's DOM and `kpmg-*` classes.
+Standalone, `OnPush`, signal inputs; selectors are `kpmg-<name>`. Each mirrors its React counterpart's DOM and `kpmg-*` classes. All 18 React components are ported.
 
 | Selector | Mirrors | Notes |
 |---|---|---|
@@ -47,6 +47,20 @@ Standalone, `OnPush`, signal inputs; selectors are `kpmg-<name>`. Each mirrors i
 | `<kpmg-switch>` | `Switch` | `[(checked)]` or `defaultChecked`; label/helper are strings |
 | `<kpmg-textarea>` | `Textarea` | `[(value)]` or `defaultValue`; `id` is `textareaId` |
 | `<kpmg-tooltip>` | `Tooltip` | Anchor is projected content; `static` for standalone; custom body via `contentTemplate`; `[(open)]` |
+| `<kpmg-banner>` | `Banner` | `icon`/`action` are templates; `iconClickable` / `dismissible` inputs; outputs `iconClick`, `closed` |
+| `<kpmg-breadcrumbs>` | `Breadcrumbs` | Outputs `itemClick`, `routeToggle`, `bookmarkToggle`; icon overrides are templates |
+| `<kpmg-divider>` | `Dividers` | Same case-insensitive `orientation` / `theme` / `width` values |
+| `<kpmg-file-uploader>` | `FileUploader` | Outputs `filesSelected`, `filesDropped`; `id` is `inputId` |
+| `<kpmg-list>` + `<li kpmg-list-item>` | `List` / `ListItem` | `items` data or projected rows; `interactive` replaces `onClick` presence |
+| `<kpmg-progress-indicator>` | `ProgressIndicator` | Linear/circular, determinate/indeterminate |
+| `<kpmg-slider>` | `Slider` | `[(value)]` or `defaultValue`; output `changed` |
+| `<kpmg-snackbar>`, `<kpmg-snackbar-container>`, `SnackbarService` + `<kpmg-snackbar-outlet>` | `Snackbar`, `SnackbarContainer`, `SnackbarProvider`/`useSnackbar` | Imperative API is an injectable service |
+| `<kpmg-tab>` + `<button kpmg-tab-item>` | `Tab` / `TabItem` | `items` data or projected tabs; `[(value)]`; arrow/Home/End navigation |
+| `<kpmg-menu>` + `button[kpmg-menu-item]`, `div[kpmg-menu-group]`, `hr[kpmg-menu-divider]` | `Menu`, `MenuItem`, `MenuGroup`, `MenuDivider` | Trigger via `kpmgMenuTrigger` slot or `trigger` template (`{ open, toggle }`); `[(open)]` |
+| `<kpmg-dropdown-menu>`, `<kpmg-dropdown-item-group>`, `button[kpmg-dropdown-base]` | `DropdownMenu`, `DropdownItemGroup`, `DropdownBase` | |
+| `<kpmg-navigation-menu>` | `NavigationMenu` | Items support `group` / `divider` entries |
+| `<kpmg-overflow-menu>` | `OverflowMenu` | Set `customContent` to project your own popover body |
+| `<kpmg-assistant-menu>`, `<kpmg-assistant-card>` | `AssistantMenu`, `AssistantCard` | Set `customContent` to project your own body |
 
 Usage:
 
