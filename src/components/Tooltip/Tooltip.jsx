@@ -350,7 +350,7 @@ export const Tooltip = forwardRef(({
   // 4. Resolve Caret Size ('sm' | 'md' | 'lg')
   const resolvedCaretSize = caretSize || (
     resolvedType === 'base-small' ? 'sm' :
-    resolvedType === 'rich' ? 'lg' : 'md'
+    (resolvedType === 'rich' && !isSide) ? 'lg' : 'md'
   );
 
   // 5. Caret Fill Color based on theme

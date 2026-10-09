@@ -52,6 +52,7 @@
 .kpmg-tooltip--pos-side-l,
 .kpmg-tooltip--pos-side-r {
   flex-direction: row;
+  align-items: stretch;
 }
 
 /* ==========================================================================
@@ -88,14 +89,24 @@
 .kpmg-tooltip--base-large {
   width: var(--width-tooltip-base-lg, 200px);
 }
+.kpmg-tooltip--base-large.kpmg-tooltip--pos-side-l,
+.kpmg-tooltip--base-large.kpmg-tooltip--pos-side-r {
+  width: max-content;
+}
 .kpmg-tooltip--base-large .kpmg-tooltip__body-wrap {
+  width: var(--width-tooltip-base-lg, 200px);
   border-radius: var(--radius-tooltip-base-lg, 8px);
 }
 
 .kpmg-tooltip--rich {
   width: var(--width-tooltip-rich, 300px);
 }
+.kpmg-tooltip--rich.kpmg-tooltip--pos-side-l,
+.kpmg-tooltip--rich.kpmg-tooltip--pos-side-r {
+  width: max-content;
+}
 .kpmg-tooltip--rich .kpmg-tooltip__body-wrap {
+  width: var(--width-tooltip-rich, 300px);
   border-radius: var(--radius-tooltip-rich, 18px);
 }
 
@@ -145,7 +156,8 @@
 /* Side L & Side R Caret Slots */
 .kpmg-tooltip__caret-slot--side-l,
 .kpmg-tooltip__caret-slot--side-r {
-  height: 100%;
+  align-self: stretch;
+  height: auto;
 }
 
 .kpmg-tooltip__caret-slot--side-l.kpmg-tooltip__caret-slot--align-middle,
