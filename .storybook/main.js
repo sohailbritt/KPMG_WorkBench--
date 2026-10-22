@@ -1,20 +1,11 @@
 
 
-// TEMPORARY: only these components are shown in Storybook for now (revert this
-// commit to show all). Folder names under packages/ui/src/components.
-const VISIBLE_COMPONENTS = [
-  'AppBars', 'Badge', 'Banner', 'Button', 'Cards', 'Checkbox', 'Chip',
-  'DataTable', 'Menu', 'Modal', 'Tab', 'Textarea', 'Tooltip',
-];
-
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   "stories": [
     "../packages/ui/src/**/*.mdx",
     "../apps/react/src/**/*.mdx",
-    ...VISIBLE_COMPONENTS.map(
-      (name) => `../packages/ui/src/components/${name}/*.stories.@(js|jsx|mjs|ts|tsx)`,
-    ),
+    "../packages/ui/src/**/*.stories.@(js|jsx|mjs|ts|tsx)",
     "../apps/react/src/**/*.stories.@(js|jsx|mjs|ts|tsx)"
   ],
   "addons": [
@@ -24,6 +15,8 @@ const config = {
     "@storybook/addon-docs",
     "@storybook/addon-mcp"
   ],
+  // Side nav: first entry under each component is "Overview" (the docs page), then its variants.
+  "docs": { "defaultName": "Overview" },
   "framework": "@storybook/react-vite"
 };
 export default config;
