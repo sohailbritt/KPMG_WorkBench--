@@ -1,5 +1,5 @@
 import React from 'react';
-import { Controls, Primary, Source, Stories, useOf } from '@storybook/addon-docs/blocks';
+import { Controls, Primary, Source, useOf } from '@storybook/addon-docs/blocks';
 import { LIVE_DEMO_BASE_URL } from './config';
 import { componentDocs } from './content';
 
@@ -10,10 +10,13 @@ import { componentDocs } from './content';
  *   1.a  Usage Guideline link  -> Live Demo site (14px)
  *   1.b  Accessibility link    -> Live Demo site (14px)
  *   2.   Table of Contents (24px) - built from the sections this component has
- *   2.a  Overview  - what it is, a live example, when to use / not to use it, anatomy
- *   2.b  Variants  - what each variant is for, then the stories
+ *   2.a  Overview  - what it is, a live example
+ *   2.c  API       - props & events table, right below the Overview
+ *        When to use, When not to use, Anatomy - right below the props table
+ *   2.b  Variants  - what each variant is for, then links to every story (kept
+ *                    out of the page so it stays short; each story has its own page)
  *        Formatting & content, Behaviors - optional, per component
- *   2.c  API       - props, events, accessibility
+ *        Accessibility - its own section after Behaviors
  *   2.d  Guides    - optional short how-tos (per component, in content/<name>.ts)
  *   3.   References (24px)
  *
@@ -66,6 +69,21 @@ const variantsTable = (rows: { name: string; purpose: string }[]) =>
 const pointGroup = (id: string, title: string, points: string[]) =>
   h('div', { key: id }, subHeading(title, id), h('ul', { style: list }, points.map((p, i) => h('li', { key: i }, p))));
 
+// Links open each story in the Storybook manager (the sidebar entry), so the docs page stays short.
+const storyLinks = (stories: { id: string; name: string }[]) =>
+  h(
+    'div',
+    null,
+    subHeading(`Examples (${stories.length})`),
+    h(
+      'ul',
+      { style: { ...list, columns: 2, columnGap: 32 } },
+      stories.map((st) =>
+        h('li', { key: st.id }, h('a', { href: `./?path=/story/${st.id}`, target: '_top', style: { color: link } }, st.name)),
+      ),
+    ),
+  );
+
 interface TocEntry {
   id: string;
   label: string;
@@ -75,11 +93,11 @@ interface TocEntry {
 export function GuidelinePage() {
   const meta = useOf('meta') as {
     preparedMeta: { title: string; parameters?: { kpmgFramework?: 'react' | 'angular' } };
-    csfFile?: { stories?: Record<string, unknown> };
+    csfFile?: { stories?: Record<string, { id: string; name: string }> };
   };
   const name = meta.preparedMeta.title.split('/').pop() ?? '';
   const framework = meta.preparedMeta.parameters?.kpmgFramework ?? 'react';
-  const storyCount = Object.keys(meta.csfFile?.stories ?? {}).length;
+  const stories = Object.values(meta.csfFile?.stories ?? {});
   const slug = slugify(name);
   const doc = componentDocs[name];
   const guides = doc?.guides ?? [];
@@ -89,17 +107,15 @@ export function GuidelinePage() {
     h('a', { href: demo(hash), target: '_blank', rel: 'noreferrer', style: { fontFamily: font, fontSize: 14, color: link, textDecoration: 'underline' } }, label);
 
   const toc: TocEntry[] = [
-    {
-      id: 'overview',
-      label: 'Overview',
-      children: doc
-        ? [
-            { id: 'overview-when', label: 'When to use' },
-            ...(doc.overview.whenNot?.length ? [{ id: 'overview-when-not', label: 'When not to use' }] : []),
-            { id: 'overview-anatomy', label: 'Anatomy' },
-          ]
-        : [],
-    },
+    { id: 'overview', label: 'Overview' },
+    { id: 'api', label: 'API' },
+    ...(doc
+      ? [
+          { id: 'overview-when', label: 'When to use' },
+          ...(doc.overview.whenNot?.length ? [{ id: 'overview-when-not', label: 'When not to use' }] : []),
+          { id: 'overview-anatomy', label: 'Anatomy' },
+        ]
+      : []),
     { id: 'variants', label: 'Variants' },
     ...(doc?.formatting?.length
       ? [{ id: 'formatting', label: 'Formatting & content', children: doc.formatting.map((f, i) => ({ id: `formatting-${i}`, label: f.title })) }]
@@ -107,14 +123,7 @@ export function GuidelinePage() {
     ...(doc?.behaviors?.length
       ? [{ id: 'behaviors', label: 'Behaviors', children: doc.behaviors.map((b, i) => ({ id: `behaviors-${i}`, label: b.title })) }]
       : []),
-    {
-      id: 'api',
-      label: 'API',
-      children: [
-        { id: 'api-props', label: 'Props & events' },
-        { id: 'api-accessibility', label: 'Accessibility' },
-      ],
-    },
+    { id: 'accessibility', label: 'Accessibility' },
     ...(guides.length
       ? [{ id: 'guides', label: 'Guides', children: guides.map((g) => ({ id: `guide-${g.id}`, label: g.title })) }]
       : []),
@@ -154,28 +163,27 @@ export function GuidelinePage() {
     doc ? h('p', { style: body }, doc.overview.what) : h('p', { style: body }, 'Overview coming soon.'),
     // Live example: the component's first story
     h(Primary, null),
+
+    // API: props & events, right below the Overview
+    sectionHeading('api', 'API', 20),
+    h('p', { style: body }, 'Props and events.'),
+    h(Controls, null),
+
+    // When to use / When not to use / Anatomy: below the props table
+    doc ? sectionHeading('overview-when', 'When to use', 20) : null,
+    doc ? h('ul', { style: list }, doc.overview.when.map((w, i) => h('li', { key: i }, w))) : null,
+    doc?.overview.whenNot?.length ? sectionHeading('overview-when-not', 'When not to use', 20) : null,
+    doc?.overview.whenNot?.length ? h('ul', { style: list }, doc.overview.whenNot.map((w, i) => h('li', { key: i }, w))) : null,
+    doc ? sectionHeading('overview-anatomy', 'Anatomy', 20) : null,
     doc
-      ? h(
-          React.Fragment,
-          null,
-          subHeading('When to use', 'overview-when'),
-          h('ul', { style: list }, doc.overview.when.map((w, i) => h('li', { key: i }, w))),
-          doc.overview.whenNot?.length ? subHeading('When not to use', 'overview-when-not') : null,
-          doc.overview.whenNot?.length ? h('ul', { style: list }, doc.overview.whenNot.map((w, i) => h('li', { key: i }, w))) : null,
-          subHeading('Anatomy', 'overview-anatomy'),
-          h(
-            'ol',
-            { style: list },
-            doc.overview.anatomy.map((a, i) => h('li', { key: i }, h('strong', null, a.part), ` — ${a.description}`)),
-          ),
-        )
+      ? h('ol', { style: list }, doc.overview.anatomy.map((a, i) => h('li', { key: i }, h('strong', null, a.part), ` — ${a.description}`)))
       : null,
 
     // 2.b Variants (the first story is already shown under Overview)
     sectionHeading('variants', 'Variants', 20),
     h('p', { style: body }, 'Supported configurations of the component.'),
     doc?.variants?.length ? variantsTable(doc.variants) : null,
-    h(Stories, { title: '', includePrimary: storyCount <= 1 }),
+    stories.length > 1 ? storyLinks(stories) : null,
 
     // Formatting & content / Behaviors (optional, per component)
     doc?.formatting?.length ? sectionHeading('formatting', 'Formatting & content', 20) : null,
@@ -183,12 +191,8 @@ export function GuidelinePage() {
     doc?.behaviors?.length ? sectionHeading('behaviors', 'Behaviors', 20) : null,
     ...(doc?.behaviors ?? []).map((b, i) => pointGroup(`behaviors-${i}`, b.title, b.points)),
 
-    // 2.c API
-    sectionHeading('api', 'API', 20),
-    h('p', { style: body }, 'Props, events and accessibility.'),
-    subHeading('Props & events', 'api-props'),
-    h(Controls, null),
-    subHeading('Accessibility', 'api-accessibility'),
+    // Accessibility
+    sectionHeading('accessibility', 'Accessibility', 20),
     doc
       ? h('ul', { style: list }, doc.accessibility.map((a, i) => h('li', { key: i }, a)))
       : h('p', { style: body }, 'Accessibility notes coming soon.'),
